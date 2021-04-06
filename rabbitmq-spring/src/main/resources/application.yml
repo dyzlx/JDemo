@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: rabbitmq-spring-demo
+  profiles:
+    include: rabbitmq
