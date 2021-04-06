@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: db-connection-pool
+  profiles:
+    active: hikari
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update

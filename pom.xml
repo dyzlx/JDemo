@@ -21,6 +21,7 @@
         <module>common</module>
         <module>basic</module>
         <module>rabbitmq-spring</module>
+        <module>persistence-layer</module>
     </modules>
 
     <properties>

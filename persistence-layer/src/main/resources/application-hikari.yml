@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/testdb?charset=utf8mb4&useSSL=false
+    username: root
+    password: 658080
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 连接池最大连接数，默认10
+      # 当池中连接达到最大连接数量则请求连接时会在connection-timeout之后抛出异常
+      maximum-pool-size: 20
+      # 最小空闲连接数量，默认值和maximum-pool-size相同
+      # 当池中空闲连接小于次值并且总连接数小于maximum-pool-size时，连接池将快速添加其他连接
+      minimum-idle: 5
+      # 空闲连接最大存活时间，默认600000（6分钟）
+      idle-timeout: 180000
+      # 此属性控制从池返回的连接的默认自动提交行为，默认true
+      auto-commit: true
+      # 等待获取连接的超时时间，默认30000毫秒
+      connection-timeout: 30000
+      # 池中连接最长生命周期，使用中的连接永远不会断开连接，0表示无限寿命（不建议设置为0）
+      max-lifetime: 1800000
+      # 连接池的名称，主要出现在日志中，默认HikariPool-1
+      pool-name: hikari
+      # 从池中获取的连接是否是只读模式，默认false
+      read-only: false
+      # 连接池是否可以通过JMX暂停和恢复，默认false
+      allow-pool-suspension: false
+      # 每一个新连接创建后，将其添加到池之前执行的sql语句，默认null
+      connection-init-sql: ~
+      # 从池中返回连接的默认的事务隔离级别，默认为驱动程序的默认行为
+      transaction-isolation: ~
+      # 从池中给出连接之前执行的查询， 默认null
+      connection-test-query: ~
+      # 允许指定池使用的Codahale/Dropwizard（关于度量标准的库）实例MetricRegistry来记录各种度量标准，监控代码运行的状态
+      # 默认null
+      # metric-registry: ~
+      # 此属性允许您指定池使用的Codahale/Dropwizard 例HealthCheckRegistry来报告当前的健康信息
+      # health-check-registry: ~
