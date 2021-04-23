@@ -17,7 +17,7 @@ public class CommonProducerInterceptor<K, V> implements ProducerInterceptor<K, V
      */
     @Override
     public ProducerRecord<K, V> onSend(ProducerRecord<K, V> record) {
-        System.out.println("[" + threadNum() + "]" + "[producer interceptor] before send message");
+        System.out.println(threadNum() + "[ProducerInterceptor] before send message");
         return record;
     }
 
@@ -28,7 +28,7 @@ public class CommonProducerInterceptor<K, V> implements ProducerInterceptor<K, V
      */
     @Override
     public void onAcknowledgement(RecordMetadata metadata, Exception exception) {
-        System.out.println("[" + threadNum() + "]" + "[producer interceptor] before ack message" + ", exception=" + exception);
+        System.out.println(threadNum() + "[ProducerInterceptor] before ack message" + ", exception=" + exception);
     }
 
     /**
@@ -36,7 +36,7 @@ public class CommonProducerInterceptor<K, V> implements ProducerInterceptor<K, V
      */
     @Override
     public void close() {
-        System.out.println("[" + threadNum() + "]" + "[producer interceptor] close interceptor");
+        System.out.println(threadNum() + "[ProducerInterceptor] close interceptor");
     }
 
     @Override

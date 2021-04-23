@@ -28,7 +28,6 @@ public class CommonProducer<K, V> {
      * @param valueSerializerClass value的序列化器
      */
     public CommonProducer(Class<?> keySerializerClass, Class<?> valueSerializerClass) {
-        // 将消息Object转化为json字符串
         Properties connectionProperties = ConnectionProperties.getNewKafkaConnectionProperties();
         // 使用Kafka自带的String序列化器和反序列化器
         connectionProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializerClass.getName());
@@ -64,7 +63,7 @@ public class CommonProducer<K, V> {
         if(Objects.isNull(message)) {
             return ;
         }
-        System.out.println("[" + threadNum() + "]" + " sync send message " + message);
+        System.out.println(threadNum() + " sync send message " + message);
         // 构建消息
         ProducerRecord<K, V> record = new ProducerRecord<>(topic, partition, timeStamp, messageKey, message, headers);
         // 发送消息
@@ -72,11 +71,11 @@ public class CommonProducer<K, V> {
         // 同步阻塞获取结果
         try {
             RecordMetadata recordMetadata = future.get();
-            System.out.println("[" + threadNum() + "]" + " sync send message success," +
+            System.out.println(threadNum() + " sync send message success," +
                     " to topic " + recordMetadata.topic() + ", to partition " +
                     recordMetadata.partition() + ", offset " + recordMetadata.offset());
         } catch (InterruptedException | ExecutionException e) {
-            System.out.println("[" + threadNum() + "]" + " sync send message fail");
+            System.out.println(threadNum() + " sync send message fail");
             e.printStackTrace();
         }
     }
@@ -89,15 +88,15 @@ public class CommonProducer<K, V> {
         if(Objects.isNull(message)) {
             return ;
         }
-        System.out.println("[" + threadNum() + "]" + " async send message " + message);
+        System.out.println(threadNum() + " async send message " + message);
         // 构建消息
         ProducerRecord<K, V> record = new ProducerRecord<>(topic, partition, timeStamp, messageKey, message, headers);
         // 异步发送消息
         producer.send(record, (recordMetadata, exception) -> {
             if (Objects.nonNull(exception)) {
-                System.out.println("[" + threadNum() + "]" + " callback: async send message fail");
+                System.out.println(threadNum() + " callback: async send message fail");
             } else {
-                System.out.println("[" + threadNum() + "]" + " callback: async send message success," +
+                System.out.println(threadNum() + " callback: async send message success," +
                         " to topic " + recordMetadata.topic() + ", to partition " +
                         recordMetadata.partition() + ", offset " + recordMetadata.offset());
             }
@@ -107,22 +106,4 @@ public class CommonProducer<K, V> {
     public void close() {
         this.producer.close();
     }
-
-//        final ObjectMapper objectMapper;
-//        objectMapper = new ObjectMapper();
-//        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-//        objectMapper.activateDefaultTyping(
-//                LaissezFaireSubTypeValidator.instance,
-//                ObjectMapper.DefaultTyping.NON_FINAL,
-//                JsonTypeInfo.As.PROPERTY);
-//        CommonProducer<String, String> commonProducer = new CommonProducer<>();
-//        commonProducer.sendSync(null,
-//                objectMapper.writeValueAsString(KafkaDemoMessage.builder().id(UUID.randomUUID().toString()).title("test").content("duyunze love lx").build()),
-//                topic,
-//                null, null, null);
-//        commonProducer.sendAsync(null,
-//                objectMapper.writeValueAsString(KafkaDemoMessage.builder().id(UUID.randomUUID().toString()).title("test").content("duyunze love lx").build()),
-//                topic,
-//                null, null, null);
-//        commonProducer.close();
 }

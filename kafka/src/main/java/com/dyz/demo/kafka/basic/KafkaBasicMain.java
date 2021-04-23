@@ -36,7 +36,7 @@ public class KafkaBasicMain {
                 // 在1s的时间段内拉取消息，可能拉取到多个topic的多个消息
                 ConsumerRecords<String, String> messageList = consumer.poll(Duration.ofMillis(1000));
                 for(ConsumerRecord<String, String> message : messageList) {
-                    System.out.println("[" + threadNum() + "]" + " consume message " + message.value() + " from topic " + message.topic() +" partition " + message.partition());
+                    System.out.println(threadNum() + " consume message " + message.value() + " from topic " + message.topic() +" partition " + message.partition());
                 }
                 // 睡一下，降低CPU
                 try {
@@ -53,7 +53,7 @@ public class KafkaBasicMain {
             ProducerRecord<String, String> message = new ProducerRecord<>(topic, "hello-" + i);
             // 发送消息
             try {
-                System.out.println("[" + threadNum() + "]" + " producer send message " + message.value() + " from topic " + message.topic() +" partition " + message.partition());
+                System.out.println(threadNum() + " producer send message " + message.value() + " from topic " + message.topic() +" partition " + message.partition());
                 producer.send(message);
             } catch (Exception e) {
                 e.printStackTrace();
