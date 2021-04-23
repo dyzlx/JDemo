@@ -17,6 +17,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dyz.demo.common.utils.CommonUtil.threadNum;
 
@@ -60,6 +62,7 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
                         }
                     });
                     // 这样提交offset容易造成消息丢失（因为提交的时候还不知道消息是否已经真正处理完）
+                    // TODO 防止消息丢失
                     this.kafkaConsumer.commitSync();
                 }
             }
@@ -68,7 +71,8 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
         } catch (Exception e) {
             System.out.println(threadNum() + "consume error! " + e.getMessage());
         } finally {
-
+            // 最后的把关，防止重复消费
+            this.kafkaConsumer.commitSync();
         }
     }
 
@@ -93,7 +97,34 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
         }
         partitionExecutorMap.clear();
         for(TopicPartition tp : tps) {
-            partitionExecutorMap.put(tp, Executors.newSingleThreadExecutor());
+            partitionExecutorMap.put(tp, Executors.newSingleThreadExecutor(new ConsumerThreadFactory(tp.toString())));
+        }
+    }
+
+    private static class ConsumerThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        ConsumerThreadFactory(String slot) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                    Thread.currentThread().getThreadGroup();
+            namePrefix = "pool-" +
+                    poolNumber.getAndIncrement() + slot +
+                    "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                    namePrefix + threadNumber.getAndIncrement(),
+                    0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
         }
     }
 }
