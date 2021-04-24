@@ -36,8 +36,6 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
 
     private Map<TopicPartition, ExecutorService> partitionExecutorMap = new HashMap<>();
 
-    Map<TopicPartition, OffsetAndMetadata> offsets = new ConcurrentHashMap<>();
-
     public MultiThreadsConsumer(String consumerGroupId) {
         super(consumerGroupId);
     }
@@ -59,6 +57,7 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
                     initPartitionExecutorMap(tps);
                 }
                 CountDownLatch countDownLatch = new CountDownLatch(tps.size());
+                Map<TopicPartition, OffsetAndMetadata> offsets = new ConcurrentHashMap<>();
                 // 每个分区的消息交给对应的SingleThreadExecutor处理
                 for(TopicPartition tp : tps) {
                     List<ConsumerRecord<K,V>> tpRecords = records.records(tp);
@@ -72,7 +71,6 @@ public class MultiThreadsConsumer<K,V> extends CommonConsumer<K,V> {
                 }
                 this.kafkaConsumer.commitSync(offsets);
                 System.out.println(threadNum() + "commit offsets " + offsets);
-                offsets.clear();
             }
         } catch (WakeupException wakeupException) {
             System.out.println("[Error]" + threadNum() + "consumer wake up!");
