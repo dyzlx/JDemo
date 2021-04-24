@@ -87,7 +87,8 @@ public class CommonConsumer<K, V> {
                 Set<TopicPartition> tps = records.partitions();
                 for(TopicPartition tp : tps) {
                     for(ConsumerRecord<K, V> record : records.records(tp)) {
-                        System.out.println(threadNum() + " consume message " + record.value() + " from topic " + record.topic() +" partition " + record.partition());
+                        System.out.println(threadNum() + " consume message key=" + record.key() + " value=" + record.value() +
+                                " from topic " + record.topic() +" partition " + record.partition());
                     }
                     // 先处理消息在提交消费位移，防止消息丢失
                     System.out.println(threadNum() + "commit consume offsets for partition: " + tp);
@@ -112,11 +113,13 @@ public class CommonConsumer<K, V> {
         return new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-                System.out.println(threadNum() + "[ConsumerRebalanceListener] current consumer will stop polling message from those partition: " + partitions);
+                System.out.println(threadNum() + "[ConsumerRebalanceListener]" +
+                        " current consumer will stop polling message from those partition: " + partitions);
             }
             @Override
             public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                System.out.println(threadNum() + "[ConsumerRebalanceListener] current consumer will start polling message from those partition: " + partitions);
+                System.out.println(threadNum() + "[ConsumerRebalanceListener]" +
+                        " current consumer will start polling message from those partition: " + partitions);
             }
         };
     }
